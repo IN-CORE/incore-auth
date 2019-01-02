@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: incore-frag-svc-deployment
+  labels:
+    app: incore-frag-svc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: incore-frag-svc
+  template:
+    metadata:
+      labels:
+        app: incore-frag-svc
+    spec:
+      hostAliases:
+      - ip: "141.142.210.203"
+        hostnames:
+        - "incore2-mongo1.os.ncsa.edu"
+        - "incore2-mongo1"
+      - ip: "141.142.210.205"
+        hostnames:
+        - "incore2-mongo2.os.ncsa.edu"
+        - "incore2-mongo2"
+      - ip: "141.142.210.206"
+        hostnames:
+        - "incore2-mongo3.os.ncsa.edu"
+        - "incore2-mongo3"
+      containers:
+      - name: incore-frag-jetty
+        image: hub.ncsa.illinois.edu/incore/fragility-jetty:v0.1
+        env:
+          - name: JETTY_PORT
+            value: "8888"
+        ports:
+          - containerPort: 8888
+            name: incore-frag-api

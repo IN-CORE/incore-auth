@@ -1,13 +1,13 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-name: ambassador
+  name: ambassador
 spec:
-rules:
-- host: incorehub.ndslabs.org
-http:
-paths:
-- path: /
-backend:
-serviceName: ambassador
-servicePort: 80
+  rules:
+  - host: incorehub2.ndslabs.org
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: ambassador
+          servicePort: 80

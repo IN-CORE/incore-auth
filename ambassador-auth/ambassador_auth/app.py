@@ -3,33 +3,47 @@ from flask import Flask, request, Response, make_response
 import requests
 import logging
 
-app = Flask(__name__)
-
+app = Flask(__name__, instance_relative_config=True)
+app.config.from_pyfile('config.py')
 
 @app.before_request
 def verify_token():
     """
-    This function verifies if any request contains the authorization token in its headers or cookies, then it verifies
-    with keycloak if the token is valid, and updates the headers with the user info if successful.
-    :return: user info headers and 200 if token is valid, 401 otherwise.
+    This function distinguishes between requests that need authentication and  verifies if those who need to be
+    authenticated contain the authorization token in its headers or cookies and verifies
+    with keycloak if the token is valid. If the verification was successful, it updates the headers with
+    the user-info received from keycloak.
+    :return: 200 if authentication is not required, 200 if authentication is required and token is present and valid,
+    401 otherwise.
     """
-    headers = {}
-    if request.headers.get('Authorization') is not None:
-        headers['Authorization'] = request.headers['Authorization']
-    elif 'Authorization' in request.cookies:
-        headers['Authorization'] = request.cookies['Authorization']
+    # check if the url is for the /healthz route, in the future we might need check what is the actual rule
+    if request.url_rule is not None:
+        return healthz()
+    # check if the url contains a keyword for the incore services
+    if '/api' in request.url or '/dfr3' in request.url or '/data' in request.url or '/hazard' in request.url \
+            or '/space' in request.url or '/doc' in request.url:
+        headers = {}
+        if request.headers.get('Authorization') is not None:
+            headers['Authorization'] = request.headers['Authorization']
+        else:
+            response = make_response('Unauthorized', 401)
+            return response
+
+        url = app.config["KEYCLOAK_USERINFO"]
+        r = requests.get(url, headers=headers)
+        if r.status_code == 200:
+            response = make_response("OK", r.status_code)
+            response.headers['x-auth-userinfo'] = r.text
+            return response
+
+        return Response(status=401)
     else:
-        response = make_response('Unauthorized', 401)
-        return response
+        return Response(status=200)
 
-    url = r'https://incore-dev-kube.ncsa.illinois.edu/auth/realms/In-core/protocol/openid-connect/userinfo'
-    r = requests.get(url, headers=headers)
-    if r.status_code == 200:
-        response = make_response('OK', r.status_code)
-        response.headers['x-auth-userinfo'] = r.text
-        return response
 
-    return Response(status=401)
+@app.route("/healthz", methods=["GET"])
+def healthz():
+    return Response("Healthz OK", 200)
 
 
 @app.before_first_request

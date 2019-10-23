@@ -22,15 +22,14 @@ RUN apk add --no-cache \
 
 WORKDIR /srv
 
-#COPY requirements/ requirements/
-COPY requirements.txt .
-RUN pip install -Ur requirements.txt
-
 COPY ambassador_auth ambassador_auth
+
+RUN pip install -Ur ambassador_auth/requirements.txt
 
 WORKDIR /srv/ambassador_auth
 
-ENV FLASK_APP="app.py"
+ENV FLASK_APP="app.py" \
+   KEYCLOAK_URL=""
 
 CMD ["python", "-m", "flask", "run", "--host", "0.0.0.0"]
 

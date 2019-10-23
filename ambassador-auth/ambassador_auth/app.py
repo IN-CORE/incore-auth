@@ -26,6 +26,8 @@ def verify_token():
         headers = {}
         if request.headers.get('Authorization') is not None:
             headers['Authorization'] = request.headers['Authorization']
+        elif request.cookies.get('Authorization') is not None:
+            headers['Authorization'] = request.cookies['Authorization']
         else:
             response = make_response('Unauthorized', 401)
             return response

@@ -37,6 +37,7 @@ def verify_token():
         if r.status_code == 200:
             response = Response(status=200)
             response.headers['x-auth-userinfo'] = r.text
+            response.headers['Authorization'] = headers['Authorization']
             return response
 
         return Response(status=401)

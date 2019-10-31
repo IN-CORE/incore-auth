@@ -21,8 +21,8 @@ def verify_token():
         return healthz()
 
     # check if the url contains a keyword for the incore services
-    if '/api' in request.url or '/dfr3' in request.url or '/data' in request.url or '/hazard' in request.url \
-            or '/space' in request.url or '/doc' in request.url or '/service' in request.url:
+    if '/dfr3' in request.url or '/data' in request.url or '/hazard' in request.url \
+            or '/space' in request.url or '/service' in request.url:
         headers = {}
         if request.headers.get('Authorization') is not None:
             headers['Authorization'] = request.headers['Authorization']

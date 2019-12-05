@@ -1,9 +1,10 @@
+import config as cfg
+import logging
+import requests
+
 from flask import Flask, request, Response, make_response
 from flask_caching import Cache
-
-import requests
-import logging
-import config as cfg
+from urllib.parse import unquote_plus
 
 config = {
     "DEBUG": True,
@@ -30,22 +31,23 @@ def verify_token():
     # check if the url is for the /healthz route, in the future we might need to check what is the actual rule
     if request.url_rule is not None:
         return healthz()
-
+    app.logger.info(request)
     # check if the url contains a keyword for the IN-CORE services
     if '/dfr3' in request.url or '/data' in request.url or '/hazard' in request.url \
-            or '/space' in request.url or '/service' in request.url:
+            or '/space' in request.url or '/service' in request.url or '/doc' in request.url:
         headers = {}
+        app.logger.info(request.headers)
         if request.headers.get('Authorization') is not None:
-            headers['Authorization'] = request.headers['Authorization']
-            token = request.headers['Authorization']
+            headers['Authorization'] = unquote_plus(request.headers['Authorization'])
+            app.logger.info("getting authorization from headers")
         elif request.cookies.get('Authorization') is not None:
-            headers['Authorization'] = request.cookies['Authorization']
-            token = request.headers['Authorization']
+            headers['Authorization'] = unquote_plus(request.cookies['Authorization'])
+            app.logger.info("getting authorization from cookies")
         else:
             response = make_response('Unauthorized', 401)
             return response
 
-        response = get_user_info_from_cache(token)
+        response = get_user_info_from_cache(headers['Authorization'])
         if response is not None:
             return response
 
@@ -81,6 +83,7 @@ def get_user_info_from_cache(token: str):
     response = Response(status=200)
     response.headers['x-auth-userinfo'] = user_info
     response.headers['Authorization'] = token
+    app.logger.info("Returning user-info from cache")
     return response
 
 

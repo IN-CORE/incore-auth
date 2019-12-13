@@ -10,7 +10,7 @@ config = {
     "DEBUG": True,
     "CACHE_TYPE": "simple",
     "CACHE_THRESHOLD": 500,  # max number of items the cache stores before it starts deleting values
-    "CACHE_DEFAULT_TIMEOUT": 86400  # cache will last for one hour
+    "CACHE_DEFAULT_TIMEOUT": 86400  # cache will last for one day
 }
 app = Flask(__name__)
 

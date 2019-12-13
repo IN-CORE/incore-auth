@@ -80,6 +80,7 @@ def get_user_info_from_cache(token: str):
     response = Response(status=200)
     response.headers['x-auth-userinfo'] = user_info
     response.headers['Authorization'] = token
+    app.logger.info(user_info)
     return response
 
 

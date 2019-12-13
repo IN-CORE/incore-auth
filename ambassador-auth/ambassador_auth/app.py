@@ -10,7 +10,7 @@ config = {
     "DEBUG": True,
     "CACHE_TYPE": "simple",
     "CACHE_THRESHOLD": 500,  # max number of items the cache stores before it starts deleting values
-    "CACHE_DEFAULT_TIMEOUT": 3600  # cache will last for one hour
+    "CACHE_DEFAULT_TIMEOUT": 86400  # cache will last for one hour
 }
 app = Flask(__name__)
 
@@ -31,18 +31,15 @@ def verify_token():
     # check if the url is for the /healthz route, in the future we might need to check what is the actual rule
     if request.url_rule is not None:
         return healthz()
-    app.logger.info(request)
+
     # check if the url contains a keyword for the IN-CORE services
     if '/dfr3' in request.url or '/data' in request.url or '/hazard' in request.url \
             or '/space' in request.url or '/service' in request.url or '/doc' in request.url:
         headers = {}
-        app.logger.info(request.headers)
         if request.headers.get('Authorization') is not None:
             headers['Authorization'] = unquote_plus(request.headers['Authorization'])
-            app.logger.info("getting authorization from headers")
         elif request.cookies.get('Authorization') is not None:
             headers['Authorization'] = unquote_plus(request.cookies['Authorization'])
-            app.logger.info("getting authorization from cookies")
         else:
             response = make_response('Unauthorized', 401)
             return response
@@ -83,7 +80,6 @@ def get_user_info_from_cache(token: str):
     response = Response(status=200)
     response.headers['x-auth-userinfo'] = user_info
     response.headers['Authorization'] = token
-    app.logger.info("Returning user-info from cache")
     return response
 
 
@@ -100,6 +96,7 @@ def get_user_info_from_keycloak(headers: dict):
         cache.set(headers['Authorization'], r.text)
         response.headers['x-auth-userinfo'] = r.text
         response.headers['Authorization'] = headers['Authorization']
+        app.logger.info(r.text)
         return response
     return Response(status=401)
 

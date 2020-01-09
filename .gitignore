@@ -34,3 +34,4 @@ server/local.properties
 *-test*
 *_test*
 
+__pycache__

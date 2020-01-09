@@ -31,7 +31,7 @@ WORKDIR /srv/ambassador_auth
 ENV FLASK_APP="app.py" \
    KEYCLOAK_URL=""
 
-CMD ["python", "-m", "flask", "run", "--host", "0.0.0.0"]
+#CMD ["python", "-m", "flask", "run", "--host", "0.0.0.0"]
 CMD ["gunicorn", "app:app", "--config", "/srv/ambassador_auth/gunicorn.config.py"]
 
 #ENTRYPOINT ["gunicorn", \

@@ -30,3 +30,7 @@ server/incore-v2.iws
 server/local.properties
 
 .vagrant/
+
+*-test*
+*_test*
+

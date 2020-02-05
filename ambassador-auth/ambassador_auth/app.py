@@ -7,10 +7,11 @@ from flask_caching import Cache
 from urllib.parse import unquote_plus
 
 config = {
-    "DEBUG": True,
-    "CACHE_TYPE": "simple",
-    "CACHE_THRESHOLD": 500,  # max number of items the cache stores before it starts deleting values
-    "CACHE_DEFAULT_TIMEOUT": 86400  # cache will last for one day
+    "DEBUG": False,
+    "CACHE_TYPE": "filesystem",
+    "CACHE_THRESHOLD": 600,  # max number of items the cache stores before it starts deleting values
+    "CACHE_DEFAULT_TIMEOUT": 86400,  # cache will last for one day
+    "CACHE_DIR": "./cache/"
 }
 app = Flask(__name__)
 
@@ -80,7 +81,8 @@ def get_user_info_from_cache(token: str):
     response = Response(status=200)
     response.headers['x-auth-userinfo'] = user_info
     response.headers['Authorization'] = token
-    app.logger.info(user_info)
+    # for testing purposes
+    # app.logger.info(user_info)
     return response
 
 
@@ -102,5 +104,6 @@ def get_user_info_from_keycloak(headers: dict):
     return Response(status=401)
 
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+# for testing locally
+# if __name__ == "__main__":
+#     app.run(host="0.0.0.0", port=5000, debug=True)

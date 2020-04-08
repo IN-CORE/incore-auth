@@ -1,9 +1,12 @@
-import config as cfg
 import logging
+import os
+
 import requests
 
 from flask import Flask, request, Response, make_response
 from flask_caching import Cache
+from jose import jwt
+from jose.exceptions import JWTError, ExpiredSignatureError, JWTClaimsError
 from urllib.parse import unquote_plus
 
 config = {
@@ -35,7 +38,7 @@ def verify_token():
 
     # check if the url contains a keyword for the IN-CORE services
     if '/dfr3' in request.url or '/data' in request.url or '/hazard' in request.url \
-            or '/space' in request.url or '/service' in request.url:
+            or '/space' in request.url or '/service' in request.url or '/lab' in request.url:
         headers = {}
         if request.headers.get('Authorization') is not None:
             headers['Authorization'] = unquote_plus(request.headers['Authorization'])
@@ -45,13 +48,31 @@ def verify_token():
             response = make_response('Unauthorized', 401)
             return response
 
+        public_key = f"-----BEGIN PUBLIC KEY-----\n"\
+                     f"{str(os.environ.get('KEYCLOAK_PUBLIC_KEY'))}"\
+                     f"\n-----END PUBLIC KEY-----"
+        access_token = headers['Authorization'].split(" ")[1]
+        try:
+            access_token = jwt.decode(access_token, public_key)
+        except JWTError:
+            return make_response('JWT Error: token signature is invalid', 401)
+        except ExpiredSignatureError:
+            return make_response('JWT Expired Signature Error: token signature has expired', 401)
+        except JWTClaimsError:
+            return make_response('JWT Claims Error: token signature is invalid', 401)
+
+        if '/lab' in request.url:
+            if "incore_jupyter" not in access_token["groups"]:
+                return Response(status=403)
+        else:
+            if "incore_user" not in access_token["groups"]:
+                return Response(status=403)
         response = get_user_info_from_cache(headers['Authorization'])
         if response is not None:
             return response
 
         # if token not in cache, return response from keycloak
         return get_user_info_from_keycloak(headers)
-
     else:
         return Response(status=200)
 
@@ -92,7 +113,7 @@ def get_user_info_from_keycloak(headers: dict):
     :param headers: dictionary containing Authorization bearer access token
     :return: HTTP response 200 with updated headers containing user-info, HTTP response 401 otherwise
     """
-    url = cfg.KEYCLOAK_URL
+    url = os.environ.get('KEYCLOAK_URL')
     r = requests.get(url, headers=headers)
     if r.status_code == 200:
         response = Response(status=200)

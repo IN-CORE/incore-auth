@@ -82,7 +82,7 @@ def verify_token():
 
 @app.route("/healthz", methods=["GET"])
 def healthz():
-    return Response("Healthz OK", 200)
+    return Response("OK", 200)
 
 
 @app.before_first_request

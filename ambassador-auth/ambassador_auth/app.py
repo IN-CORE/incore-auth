@@ -38,7 +38,8 @@ def verify_token():
 
     # check if the url contains a keyword for the IN-CORE services
     if '/dfr3' in request.url or '/data' in request.url or '/hazard' in request.url \
-            or '/space' in request.url or '/service' in request.url or '/lab' in request.url:
+            or '/space' in request.url or '/service' in request.url or '/lab' in request.url \
+            or '/hub' in request.url or '/user' in request.url:
         headers = {}
         if request.headers.get('Authorization') is not None:
             headers['Authorization'] = unquote_plus(request.headers['Authorization'])
@@ -64,7 +65,7 @@ def verify_token():
         except JWTError:
             return make_response('JWT Error: token signature is invalid', 401)
 
-        if '/lab' in request.url:
+        if '/lab' in request.url or '/hub' in request.url or '/user' in request.url:
             if "incore_jupyter" not in access_token["groups"]:
                 return Response(status=403)
         else:

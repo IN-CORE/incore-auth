@@ -51,15 +51,18 @@ def verify_token():
         public_key = f"-----BEGIN PUBLIC KEY-----\n"\
                      f"{str(os.environ.get('KEYCLOAK_PUBLIC_KEY'))}"\
                      f"\n-----END PUBLIC KEY-----"
-        access_token = headers['Authorization'].split(" ")[1]
+        try:
+            access_token = headers['Authorization'].split(" ")[1]
+        except IndexError:
+            return make_response('Invalid token', 401)
         try:
             access_token = jwt.decode(access_token, public_key)
-        except JWTError:
-            return make_response('JWT Error: token signature is invalid', 401)
         except ExpiredSignatureError:
             return make_response('JWT Expired Signature Error: token signature has expired', 401)
         except JWTClaimsError:
             return make_response('JWT Claims Error: token signature is invalid', 401)
+        except JWTError:
+            return make_response('JWT Error: token signature is invalid', 401)
 
         if '/lab' in request.url:
             if "incore_jupyter" not in access_token["groups"]:

@@ -9,8 +9,7 @@ from urllib.parse import unquote_plus
 
 config = {
     "PROTECTED_RESOURCES": ["dfr3", "data", "hazard", "space"],
-    "GROUPS": {"incore_user": ["dfr3", "data", "hazard", "space"],
-               "incore_jupyter": ["lab", "hub"]}
+    "GROUPS": {"incore_user": ["dfr3", "data", "hazard", "space"]}
 }
 
 app = Flask(__name__)

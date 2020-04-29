@@ -89,7 +89,8 @@ def verify_token():
     # the user belongs to
     user_accessible_resources = []
     for group in user_groups:
-        user_accessible_resources.extend(app.config["GROUPS"][group])
+        if group in app.config["GROUPS"]:
+            user_accessible_resources.extend(app.config["GROUPS"][group])
 
     if resource not in user_accessible_resources:
         return Response(status=403)

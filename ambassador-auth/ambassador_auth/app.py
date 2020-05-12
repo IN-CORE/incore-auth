@@ -1,4 +1,5 @@
 import logging
+import json
 import os
 
 from flask import Flask, request, Response, make_response, json
@@ -6,10 +7,7 @@ from jose import jwt
 from jose.exceptions import JWTError, ExpiredSignatureError, JWTClaimsError
 from urllib.parse import unquote_plus
 
-config = {
-    "PROTECTED_RESOURCES": ["dfr3", "data", "hazard", "space"],
-    "GROUPS": {"incore_user": ["dfr3", "data", "hazard", "space"]}
-}
+config = json.load(open("config.json"))
 
 app = Flask(__name__)
 
@@ -66,10 +64,14 @@ def verify_token():
     public_key = f"-----BEGIN PUBLIC KEY-----\n" \
         f"{str(os.environ.get('KEYCLOAK_PUBLIC_KEY'))}" \
         f"\n-----END PUBLIC KEY-----"
+    audience = os.environ.get('KEYCLOAK_AUDIENCE', None)
+    if audience == "":
+        audience = None
 
     # decode token for validating its signature
     try:
-        access_token = jwt.decode(access_token, public_key)
+        access_token = jwt.decode(access_token, public_key,
+                                  audience = audience)
     except ExpiredSignatureError:
         return make_response(
             'JWT Expired Signature Error: token signature has expired', 401)
@@ -78,22 +80,32 @@ def verify_token():
                              401)
     except JWTError:
         return make_response('JWT Error: token signature is invalid', 401)
+    except Exception:
+        return make_response('JWT Error: invalid token', 401)
 
     # retrieve the groups the user belongs to from access token
-    try:
-        user_groups = access_token["groups"]
-    except KeyError:
-        return make_response('Invalid token', 401)
+    user_groups = access_token.get("groups", [])
+    if "roles" in access_token:
+        user_roles = access_token["roles"]
+    elif "realm_access" in access_token:
+        user_roles = access_token["realm_access"].get("roles", [])
+    else:
+        user_roles = []
 
     # get all resources the user can access to, based on the groups
     # the user belongs to
     user_accessible_resources = []
-    for group in user_groups:
-        if group in app.config["GROUPS"]:
-            user_accessible_resources.extend(app.config["GROUPS"][group])
+    if "GROUPS" in app.config:
+        for group in user_groups:
+            if group in app.config["GROUPS"]:
+                user_accessible_resources.extend(app.config["GROUPS"][group])
+    if "ROLES" in app.config:
+        for role in user_roles:
+            if role in app.config["ROLES"]:
+                user_accessible_resources.extend(app.config["ROLES"][role])
 
     if resource not in user_accessible_resources:
-        return Response(status=403)
+        return make_response("access denied", 403)
 
     # form user-info and add it to the response headers
     user_info = {"preferred_username": access_token["preferred_username"]}

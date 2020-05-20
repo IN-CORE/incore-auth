@@ -1,7 +1,5 @@
 bcrypt==3.1.0
 flask==0.12.2
 gunicorn==19.7.1
-pyyaml==3.12
-requests==2.22.0
-Flask-Caching==1.8.0
 gevent==1.4.0
+python-jose==3.1.0

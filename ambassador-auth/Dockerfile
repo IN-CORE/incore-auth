@@ -22,14 +22,16 @@ RUN apk add --no-cache \
 
 WORKDIR /srv
 
-COPY ambassador_auth ambassador_auth
-
+COPY ambassador_auth/requirements.txt ambassador_auth/
 RUN pip install -Ur ambassador_auth/requirements.txt
+
+COPY ambassador_auth ambassador_auth
 
 WORKDIR /srv/ambassador_auth
 
 ENV FLASK_APP="app.py" \
-   KEYCLOAK_URL=""
+    KEYCLOAK_PUBLIC_KEY="" \
+    KEYCLOAK_AUDIENCE=""
 
 #CMD ["python", "-m", "flask", "run", "--host", "0.0.0.0"]
 CMD ["gunicorn", "app:app", "--config", "/srv/ambassador_auth/gunicorn.config.py"]

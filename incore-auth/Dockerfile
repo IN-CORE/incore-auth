@@ -22,25 +22,25 @@ RUN apk add --no-cache \
 
 WORKDIR /srv
 
-COPY ambassador_auth/requirements.txt ambassador_auth/
-RUN pip install -Ur ambassador_auth/requirements.txt
+COPY incore_auth/requirements.txt incore_auth/
+RUN pip install -Ur incore_auth/requirements.txt
 
-COPY ambassador_auth ambassador_auth
+COPY incore_auth incore_auth
 
-WORKDIR /srv/ambassador_auth
+WORKDIR /srv/incore_auth
 
 ENV FLASK_APP="app.py" \
     KEYCLOAK_PUBLIC_KEY="" \
     KEYCLOAK_AUDIENCE=""
 
 #CMD ["python", "-m", "flask", "run", "--host", "0.0.0.0"]
-CMD ["gunicorn", "app:app", "--config", "/srv/ambassador_auth/gunicorn.config.py"]
+CMD ["gunicorn", "app:app", "--config", "/srv/incore_auth/gunicorn.config.py"]
 
 #ENTRYPOINT ["gunicorn", \
 #    "--access-logfile=-", \
 #    "--log-level=info", \
 #    "--workers=3", \
 #    "--bind=0.0.0.0:5000", \
-#    "ambassador_auth.app:app" \
+#    "incore_auth.app:app" \
 #    ]
 

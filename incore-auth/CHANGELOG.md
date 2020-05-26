@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ## Unreleased
 - Added a group check to tokens for validating authorization to resources - [INCORE1-553](https://opensource.ncsa.illinois.edu/jira/browse/INCORE1-553)
-
+- Renamed service [INCORE1-621](https://opensource.ncsa.illinois.edu/jira/browse/INCORE1-621)
 ## [0.1.4] - 2019-11-22
 ### Added
 - Added a cache to store {token: user-info} to avoid excessive calls to keycloak

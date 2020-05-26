@@ -43,7 +43,7 @@ def get_config():
     cfg.style = "git-describe"
     cfg.tag_prefix = ""
     cfg.parentdir_prefix = "None"
-    cfg.versionfile_source = "ambassador_auth/_version.py"
+    cfg.versionfile_source = "incore_auth/_version.py"
     cfg.verbose = False
     return cfg
 

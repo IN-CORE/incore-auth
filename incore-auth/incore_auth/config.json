@@ -1,5 +1,5 @@
 {
-    "PROTECTED_RESOURCES": ["dfr3", "data", "hazard", "space"],
+    "PROTECTED_RESOURCES": ["dfr3", "data", "hazard", "space", "semantics"],
     "GROUPS": {"incore_user": ["dfr3", "data", "hazard", "space"]},
     "ROLES": {"incore_user": ["dfr3", "data", "hazard", "space"]}
 }

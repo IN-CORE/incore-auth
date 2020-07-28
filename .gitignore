@@ -34,4 +34,5 @@ server/local.properties
 *-test*
 *_test*
 
+.dockerconfigjson
 __pycache__

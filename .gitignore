@@ -34,4 +34,9 @@ server/local.properties
 *-test*
 *_test*
 
+*.crt
+*.tls
+*.properties
+
+*.dockerconfigjson
 __pycache__

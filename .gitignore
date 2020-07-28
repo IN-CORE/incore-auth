@@ -34,9 +34,14 @@ server/local.properties
 *-test*
 *_test*
 
-*.crt
-*.tls
-*.properties
+# for kustomize
+*incore-secrets.zip
 
 *.dockerconfigjson
+*tls.crt
+*tls.key
+*keycloak.properties
+*incore-service.properties
+*values.postgresql.yaml
+
 __pycache__

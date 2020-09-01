@@ -44,4 +44,6 @@ server/local.properties
 *incore-service.properties
 *values.postgresql.yaml
 
+# config
+*config_jupyterhub*
 __pycache__

@@ -1,6 +1,7 @@
 import logging
 import json
 import os
+import urllib.request
 
 from flask import Flask, request, Response, make_response, json
 from jose import jwt
@@ -61,17 +62,11 @@ def verify_token():
         access_token = headers['Authorization'].split(" ")[1]
     except IndexError:
         return make_response('Invalid token', 401)
-    public_key = f"-----BEGIN PUBLIC KEY-----\n" \
-        f"{str(os.environ.get('KEYCLOAK_PUBLIC_KEY'))}" \
-        f"\n-----END PUBLIC KEY-----"
-    audience = os.environ.get('KEYCLOAK_AUDIENCE', None)
-    if audience == "":
-        audience = None
 
     # decode token for validating its signature
     try:
-        access_token = jwt.decode(access_token, public_key,
-                                  audience = audience)
+        access_token = jwt.decode(access_token, config['public_key'],
+                                  audience=config['audience'])
     except ExpiredSignatureError:
         return make_response(
             'JWT Expired Signature Error: token signature has expired', 401)
@@ -120,8 +115,40 @@ def healthz():
     return Response("OK", 200)
 
 
+def urljson(url):
+    response = urllib.request.urlopen(url)
+    if response.code >= 200 or response <= 299:
+        encoding = response.info().get_content_charset('utf-8')
+        return json.loads(response.read().decode(encoding))
+    else:
+        raise(Exception(f"Could not load data from {url} "
+                        f"code={response.code}"))
+
+
 @app.before_first_request
 def setup():
+    keycloak_pem = os.environ.get('KEYCLOAK_PUBLIC_KEY', None)
+    if keycloak_pem:
+        config['pem'] = str(keycloak_pem)
+        logging.info("Got public_key from environment variable.")
+    else:
+        keycloak_url = os.environ.get('KEYCLOAK_URL', None)
+        if keycloak_url:
+            result = urljson(keycloak_url)
+            config['pem'] = result['public_key']
+            logging.info("Got public_key from url.")
+        else:
+            config['pem'] = ''
+            logging.error("Could not find PEM, things will be broken.")
+    config['public_key'] = f"-----BEGIN PUBLIC KEY-----\n" \
+                           f"{config['pem']}\n" \
+                           f"-----END PUBLIC KEY-----"
+
+    keycloak_audience = os.environ.get('KEYCLOAK_AUDIENCE', None)
+    if keycloak_audience:
+        config['audience'] = keycloak_audience
+    else:
+        config['audience'] = None
     if not app.debug:
         app.logger.addHandler(logging.StreamHandler())
         app.logger.setLevel(logging.INFO)

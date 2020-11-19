@@ -112,6 +112,11 @@ def verify_token():
     response = Response(status=200)
     response.headers['x-auth-userinfo'] = json.dumps(user_info)
     response.headers['Authorization'] = headers['Authorization']
+
+    if request.headers.get('x-userinfo') is not None:
+        response.headers['x-userinfo'] = request.headers.get('x-userinfo')
+    elif request.cookies.get('x-userinfo') is not None:
+        response.headers['x-userinfo'] = request.headers.get('x-userinfo')
     return response
 
 

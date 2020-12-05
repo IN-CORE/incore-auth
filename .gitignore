@@ -37,6 +37,9 @@ server/local.properties
 # for kustomize
 *incore-secrets.zip
 
+# ignore helm charts
+helm/incore/charts
+
 *.dockerconfigjson
 *tls.crt
 *tls.key

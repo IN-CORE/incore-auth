@@ -50,3 +50,9 @@ helm/incore/charts
 # config
 *config_jupyterhub*
 __pycache__
+
+# values for deployment
+values-incore*
+
+# secrets
+helm/incore/templates/secrets.yaml

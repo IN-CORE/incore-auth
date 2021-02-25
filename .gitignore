@@ -50,9 +50,13 @@ helm/incore/charts
 # config
 *config_jupyterhub*
 __pycache__
+venv
 
 # values for deployment
 values-incore*
 
 # secrets
 helm/incore/templates/secrets.yaml
+
+# ip database
+IP2LOCATION-LITE-DB5.BIN

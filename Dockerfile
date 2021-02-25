@@ -25,13 +25,18 @@ WORKDIR /srv
 COPY incore_auth/requirements.txt incore_auth/
 RUN pip install -Ur incore_auth/requirements.txt
 
+COPY IP2LOCATION-LITE-DB5.BIN* incore_auth/
+
 COPY incore_auth incore_auth
 
 WORKDIR /srv/incore_auth
 
 ENV FLASK_APP="app.py" \
     KEYCLOAK_PUBLIC_KEY="" \
-    KEYCLOAK_AUDIENCE=""
+    KEYCLOAK_AUDIENCE="" \
+    INFLUXDB_V2_URL="" \
+    INFLUXDB_V2_ORG="" \
+    INFLUXDB_V2_TOKEN=""
 
 #CMD ["python", "-m", "flask", "run", "--host", "0.0.0.0"]
 CMD ["gunicorn", "app:app", "--config", "/srv/incore_auth/gunicorn.config.py"]

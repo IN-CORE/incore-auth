@@ -33,14 +33,14 @@ if __name__ != '__main__':
 
 
 def record_request(request_info):
-    if request.path == '/':
+    if 'X-Forwarded-For' not in request.headers:
         return
 
-    remote_ip = request.headers['X-Forwarded-For']
+    remote_ip = request.headers.get('X-Forwarded-For', '')
     if not remote_ip:
         remote_ip = request.remote_addr
 
-    server = request.headers['X-Forwarded-Host']
+    server = request.headers.get('X-Forwarded-Host', '')
     if not server:
         server = request.host
 
@@ -80,6 +80,7 @@ def record_request(request_info):
         "measurement": "auth",
         "tags": tags,
         "fields": fields,
+        "time": int(time.time() * 10 ** 9)
     }
 
     #app.logger.info(request.headers)
@@ -94,7 +95,7 @@ def request_userinfo(request_info):
         if request.headers.get('Authorization') is not None:
             access_token = unquote_plus(request.headers['Authorization']).split(" ")[1]
         elif request.cookies.get('Authorization') is not None:
-            access_token = unquote_plus(request.cookies['Authorization'])
+            access_token = unquote_plus(request.cookies['Authorization']).split(" ")[1]
         else:
             app.logger.debug("Missing Authorization header")
             request_info['error'] = 'Missing Authorization information'

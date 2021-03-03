@@ -17,7 +17,8 @@ config = json.load(open("config.json"))
 app = Flask(__name__)
 app.config.from_mapping(config)
 
-resources = ["doc", "data", "dfr3", "hazard", "space", "semantics", "hub", "lab", "auth"]
+geoserver = {}
+geoserver_delta = 2
 
 # setup database for geolocation
 try:
@@ -37,6 +38,28 @@ if __name__ != '__main__':
 def record_request(request_info):
     if 'X-Forwarded-For' not in request.headers:
         return
+
+    # get some handy variables
+    username = request_info["username"]
+    resource = request_info['resource']
+    uri = request_info['uri']
+
+    # only track frontpage once
+    if resource == "frontpage" and uri != "/":
+        return
+
+    # only track geoserver once every second
+    if resource == "geoserver":
+        if username in geoserver and geoserver[username] > time.time():
+            return
+        geoserver[username] = time.time() + geoserver_delta
+
+    # skip non tracked resources
+    if resource not in config["TRACKED_RESOURCES"]:
+        app.logger.info(f"ignoring resource {resource} - {request_info}")
+        return
+
+    app.logger.info(f"adding resource {resource} - {request_info}")
 
     remote_ip = request.headers.get('X-Forwarded-For', '')
     if not remote_ip:
@@ -58,12 +81,12 @@ def record_request(request_info):
     tags = {
         "server": server,
         "http_method": request.method,
-        "resource": request_info['resource'],
-        "username": request_info['username'],
+        "resource": resource,
+        "username": username,
         "group": group
     }
     fields = {
-        "url": request_info['uri'],
+        "url": uri,
         "ip": remote_ip,
         "elapsed": time.time() - request_info['start']
     }
@@ -155,19 +178,16 @@ def request_resource(request_info):
             uri = request.url
         request_info['uri'] = uri
         pieces = uri.split('/')
-        resource = pieces[1]
-        if resource not in resources:
+        if len(pieces) == 2:
             request_info['resource'] = "frontpage"
         else:
-            request_info['resource'] = resource
-            if request_info['resource'] == "doc" and len(pieces) > 1:
+            request_info['resource'] = pieces[1]
+            if request_info['resource'] == "doc" and len(pieces) > 2:
                 request_info['fields']['manual'] = pieces[2]
-            if request_info['resource'] == "data" and uri.endswith('blob'):
+            if request_info['resource'] == "data" and len(pieces) > 4 and uri.endswith('blob'):
                 request_info['fields']['dataset'] = pieces[4]
-            if request_info['resource'] == "dfr3" and len(pieces) > 3:
+            if request_info['resource'] == "dfr3" and len(pieces) > 4:
                 request_info['fields']['fragility'] = pieces[4]
-
-        app.logger.info(json.dumps(request_info))
     except IndexError:
         app.logger.info("No / found in path.")
         request_info['resource'] = 'NA'

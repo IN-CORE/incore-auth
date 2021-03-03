@@ -1,5 +1,6 @@
 {
-    "PROTECTED_RESOURCES": ["dfr3", "data", "hazard", "space", "semantics", "datawolf", "playbook"],
-    "GROUPS": {"incore_user": ["dfr3", "data", "hazard", "space", "semantics", "datawolf", "playbook"]},
-    "ROLES": {"incore_user": ["dfr3", "data", "hazard", "space", "semantics", "datawolf", "playbook"]}
+    "PROTECTED_RESOURCES": ["data", "dfr3", "hazard", "space", "semantics", "datawolf", "playbook"],
+    "TRACKED_RESOURCES": ["data", "dfr3", "hazard", "space", "semantics", "datafwolf", "playbook", "frontpage", "geoserver", "doc", ",hub", "lab", "auth"],
+    "GROUPS": {"incore_user": ["data", "dfr3", "hazard", "space", "semantics", "datawolf", "playbook"]},
+    "ROLES": {"incore_user": ["data", "dfr3", "hazard", "space", "semantics", "datawolf", "playbook"]}
 }

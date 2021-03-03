@@ -17,6 +17,8 @@ config = json.load(open("config.json"))
 app = Flask(__name__)
 app.config.from_mapping(config)
 
+resources = ["doc", "data", "dfr3", "hazard", "space", "semantics", "hub", "lab", "auth"]
+
 # setup database for geolocation
 try:
     geolocation = IP2Location.IP2Location("IP2LOCATION-LITE-DB5.BIN")
@@ -44,6 +46,7 @@ def record_request(request_info):
     if not server:
         server = request.host
 
+    # find the group
     if "incore_ncsa" in request_info["groups"]:
         group = "NCSA"
     elif "incore_coe" in request_info["groups"]:
@@ -51,6 +54,7 @@ def record_request(request_info):
     else:
         group = "public"
 
+    # basic information for all endpoints
     tags = {
         "server": server,
         "http_method": request.method,
@@ -63,6 +67,12 @@ def record_request(request_info):
         "ip": remote_ip,
         "elapsed": time.time() - request_info['start']
     }
+
+    # store specific information
+    fields.update(request_info['fields'])
+    fields.update(request_info['tags'])
+
+    # calculate geo location
     if geolocation:
         try:
             rec = geolocation.get_all(remote_ip)
@@ -76,6 +86,7 @@ def record_request(request_info):
         except Exception:
             app.logger.error("Could not lookup IP address")
 
+    # create the datapoint that is written to influxdb
     datapoint = {
         "measurement": "auth",
         "tags": tags,
@@ -83,11 +94,12 @@ def record_request(request_info):
         "time": int(time.time() * 10 ** 9)
     }
 
-    #app.logger.info(request.headers)
+    # either write to influxdb, or to console
     if config['influxdb']:
         config['influxdb'].write("incore", "incore", datapoint)
     else:
         app.logger.info(datapoint)
+
 
 def request_userinfo(request_info):
     # retrieve access token from header or cookies
@@ -142,7 +154,20 @@ def request_resource(request_info):
         if not uri:
             uri = request.url
         request_info['uri'] = uri
-        request_info['resource'] = uri.split('/')[1]
+        pieces = uri.split('/')
+        resource = pieces[1]
+        if resource not in resources:
+            request_info['resource'] = "frontpage"
+        else:
+            request_info['resource'] = resource
+            if request_info['resource'] == "doc" and len(pieces) > 1:
+                request_info['fields']['manual'] = pieces[2]
+            if request_info['resource'] == "data" and uri.endswith('blob'):
+                request_info['fields']['dataset'] = pieces[4]
+            if request_info['resource'] == "dfr3" and len(pieces) > 3:
+                request_info['fields']['fragility'] = pieces[4]
+
+        app.logger.info(json.dumps(request_info))
     except IndexError:
         app.logger.info("No / found in path.")
         request_info['resource'] = 'NA'
@@ -179,6 +204,8 @@ def verify_token():
         "groups": [],
         "roles": [],
         "error": "",
+        "fields": {},
+        "tags": {},
         "start": time.time()
     }
 

@@ -215,6 +215,10 @@ def verify_token():
     if request.url_rule is not None:
         return healthz()
 
+    # allow options, probably CORS
+    if request.headers.get('X-Forwarded-Method', '') == 'OPTIONS':
+        return Response(status=200)
+
     # dict to hold all information
     request_info = {
         "username": "",

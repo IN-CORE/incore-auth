@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 [0.0.0] UNRELEASED
 
+Added user's group info to output response
+
 [1.0.3] - 2021-04-12
 
 First official release

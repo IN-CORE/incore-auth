@@ -262,8 +262,10 @@ def verify_token():
 
     # everything is ok
     user_info = {"preferred_username": request_info['username']}
+    group_info = {"groups": request_info['groups']}
     response = Response(status=200)
     response.headers['X-Auth-UserInfo'] = json.dumps(user_info)
+    response.headers['X-Auth-UserGroup'] = json.dumps(group_info)
 
     if request.headers.get('Authorization') is not None:
         response.headers['Authorization'] = unquote_plus(request.headers['Authorization'])
@@ -275,6 +277,11 @@ def verify_token():
         response.headers['X-UserInfo'] = request.headers.get('x-UserInfo')
     elif request.cookies.get('x-UserInfo') is not None:
         response.headers['X-UserInfo'] = request.headers.get('x-UserInfo')
+
+    if request.headers.get('X-UserGroup') is not None:
+        response.headers['X-UserGroup'] = request.headers.get('x-UserGroup')
+    elif request.cookies.get('x-UserInfo') is not None:
+        response.headers['X-UserGroup'] = request.headers.get('x-UserGroup')
 
     return response
 

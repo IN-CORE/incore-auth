@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 - user's group info to output response header
 
 # [1.0.4] - 2021-04-12
-## FIXED
+## Fixed
 - allow for options to pass without checks, this will allow for CORS requests
 
 # [1.0.3] - 2021-04-12

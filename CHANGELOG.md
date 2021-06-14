@@ -3,9 +3,9 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
-# [unreleased]
+# [1.0.5] - 2021-06-16
 ## Fixed
-- playbook is not protected resource any more since it has its own login.
+- playbook is not protected resource anymore since it has its own login.
 
 # [1.0.4] - 2021-05-19
 ## Added

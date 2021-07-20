@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+# [1.0.6] - 2021-07-28
+## Added
+- plotting service to resources
+
 # [1.0.5] - 2021-06-16
 ## Fixed
 - playbook is not protected resource anymore since it has its own login.

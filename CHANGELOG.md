@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+# [1.1.0] - 2021-10-27
+## Added
+- maestro service to resources
+
 # [1.0.6] - 2021-07-28
 ## Added
 - plotting service to resources

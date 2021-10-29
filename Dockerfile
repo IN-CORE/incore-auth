@@ -25,8 +25,6 @@ WORKDIR /srv
 COPY incore_auth/requirements.txt incore_auth/
 RUN pip install -Ur incore_auth/requirements.txt
 
-COPY IP2LOCATION-LITE-DB5.BIN* incore_auth/
-
 COPY incore_auth incore_auth
 
 WORKDIR /srv/incore_auth

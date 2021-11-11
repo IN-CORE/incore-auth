@@ -12,6 +12,11 @@ from flask import Flask, request, Response, make_response, json
 from jose import jwt
 from jose.exceptions import JWTError, ExpiredSignatureError, JWTClaimsError
 from urllib.parse import unquote_plus
+from dotenv import load_dotenv
+
+# Load .env file
+load_dotenv()
+CONTRIBUTION_DB_NAME = os.getenv('INFLUXDB_V2_FILE_LOCATION', 'data/IP2LOCATION-LITE-DB5.BIN')
 
 config = json.load(open("config.json"))
 app = Flask(__name__)
@@ -22,7 +27,7 @@ geoserver_delta = 2
 
 # setup database for geolocation
 try:
-    geolocation = IP2Location.IP2Location("data/IP2LOCATION-LITE-DB5.BIN")
+    geolocation = IP2Location.IP2Location(CONTRIBUTION_DB_NAME)
 except:
     app.logger.exception("No IP2Location database found.")
     geolocation = None

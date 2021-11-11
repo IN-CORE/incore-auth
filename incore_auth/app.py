@@ -22,7 +22,7 @@ geoserver_delta = 2
 
 # setup database for geolocation
 try:
-    geolocation = IP2Location.IP2Location("IP2LOCATION-LITE-DB5.BIN")
+    geolocation = IP2Location.IP2Location("data/IP2LOCATION-LITE-DB5.BIN")
 except:
     app.logger.exception("No IP2Location database found.")
     geolocation = None

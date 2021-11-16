@@ -34,7 +34,8 @@ ENV FLASK_APP="app.py" \
     KEYCLOAK_AUDIENCE="" \
     INFLUXDB_V2_URL="" \
     INFLUXDB_V2_ORG="" \
-    INFLUXDB_V2_TOKEN=""
+    INFLUXDB_V2_TOKEN="" \
+    INFLUXDB_V2_FILE_LOCATION="data/IP2LOCATION-LITE-DB5.BIN"
 
 #CMD ["python", "-m", "flask", "run", "--host", "0.0.0.0"]
 CMD ["gunicorn", "app:app", "--config", "/srv/incore_auth/gunicorn.config.py"]

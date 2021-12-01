@@ -281,16 +281,10 @@ def verify_token():
     elif request.cookies.get('Authorization') is not None:
         response.headers['Authorization'] = unquote_plus(request.cookies['Authorization'])
 
-    # TODO this need checking, does this allow me to impersonate anybody?
-    if request.headers.get('X-UserInfo') is not None:
-        response.headers['X-UserInfo'] = request.headers.get('x-UserInfo')
-    elif request.cookies.get('x-UserInfo') is not None:
-        response.headers['X-UserInfo'] = request.headers.get('x-UserInfo')
-
     if request.headers.get('X-UserGroup') is not None:
         response.headers['X-UserGroup'] = request.headers.get('x-UserGroup')
-    elif request.cookies.get('x-UserInfo') is not None:
-        response.headers['X-UserGroup'] = request.headers.get('x-UserGroup')
+    elif request.cookies.get('X-UserGroup') is not None:
+        response.headers['X-UserGroup'] = request.cookies['X-UserGroup']
 
     return response
 

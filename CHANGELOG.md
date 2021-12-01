@@ -9,6 +9,9 @@ From version 1.2.0 the file IP2LOCATION-LITE-DB5.BIN is no longer part of the do
 ## Added
 - IP2Location's file location as variable
 
+## Changed
+- Removed adding X-Userinfo from response headers
+
 # [1.2.1] - 2021-10-29
 
 ## Fixed

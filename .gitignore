@@ -60,3 +60,6 @@ helm/incore/templates/secrets.yaml
 
 # ip database
 IP2LOCATION-LITE-DB5.BIN
+
+# env file
+*.env

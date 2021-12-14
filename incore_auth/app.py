@@ -12,6 +12,11 @@ from flask import Flask, request, Response, make_response, json
 from jose import jwt
 from jose.exceptions import JWTError, ExpiredSignatureError, JWTClaimsError
 from urllib.parse import unquote_plus
+from dotenv import load_dotenv
+
+# Load .env file
+load_dotenv()
+CONTRIBUTION_DB_NAME = os.getenv('INFLUXDB_V2_FILE_LOCATION', 'data/IP2LOCATION-LITE-DB5.BIN')
 
 config = json.load(open("config.json"))
 app = Flask(__name__)
@@ -22,7 +27,7 @@ geoserver_delta = 2
 
 # setup database for geolocation
 try:
-    geolocation = IP2Location.IP2Location("IP2LOCATION-LITE-DB5.BIN")
+    geolocation = IP2Location.IP2Location(CONTRIBUTION_DB_NAME)
 except:
     app.logger.exception("No IP2Location database found.")
     geolocation = None
@@ -276,16 +281,10 @@ def verify_token():
     elif request.cookies.get('Authorization') is not None:
         response.headers['Authorization'] = unquote_plus(request.cookies['Authorization'])
 
-    # TODO this need checking, does this allow me to impersonate anybody?
-    if request.headers.get('X-UserInfo') is not None:
-        response.headers['X-UserInfo'] = request.headers.get('x-UserInfo')
-    elif request.cookies.get('x-UserInfo') is not None:
-        response.headers['X-UserInfo'] = request.headers.get('x-UserInfo')
-
     if request.headers.get('X-UserGroup') is not None:
         response.headers['X-UserGroup'] = request.headers.get('x-UserGroup')
-    elif request.cookies.get('x-UserInfo') is not None:
-        response.headers['X-UserGroup'] = request.headers.get('x-UserGroup')
+    elif request.cookies.get('X-UserGroup') is not None:
+        response.headers['X-UserGroup'] = request.cookies['X-UserGroup']
 
     return response
 

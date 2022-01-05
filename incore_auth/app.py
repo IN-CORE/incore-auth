@@ -183,6 +183,7 @@ def request_resource(request_info):
             uri = request.url
         request_info['uri'] = uri
         pieces = uri.split('/')
+        app.logger.info(uri + "=" + ",".join(pieces))
         if len(pieces) == 2:
             request_info['resource'] = "frontpage"
         else:

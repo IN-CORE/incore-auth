@@ -8,7 +8,8 @@ From version 1.2.0 the file IP2LOCATION-LITE-DB5.BIN is no longer part of the do
 # Unreleased
 
 ## Changed
-- Tracking calls to /DFR3Viewer /DataViewer /HazardViewer
+- Tracking calls to /DFR3Viewer /DataViewer /HazardViewer /jupyterhub
+- Only track index.html and / for doc and frontpage.
 
 # [1.3.0] - 2021-21-08
 

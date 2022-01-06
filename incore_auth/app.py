@@ -63,7 +63,6 @@ def record_request(request_info):
     if resource not in config["TRACKED_RESOURCES"]:
         app.logger.debug(f"ignoring resource {resource} - {request_info}")
         return
-
     app.logger.info(f"adding resource {resource} - {request_info}")
 
     remote_ip = request.headers.get('X-Forwarded-For', '')
@@ -184,6 +183,7 @@ def request_resource(request_info):
         request_info['uri'] = uri
         pieces = uri.split('/')
         if len(pieces) == 2:
+            app.logger.info(uri + " = " + pieces[1] + " " + str(pieces[1] in config["TRACKED_RESOURCES"]))
             if pieces[1] in config["TRACKED_RESOURCES"]:
                 request_info['resource'] = pieces[1]
             else:

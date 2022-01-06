@@ -61,7 +61,7 @@ def record_request(request_info):
 
     # skip non tracked resources
     if resource not in config["TRACKED_RESOURCES"]:
-        app.logger.info(f"ignoring resource {resource} - {request_info}")
+        app.logger.debug(f"ignoring resource {resource} - {request_info}")
         return
 
     app.logger.info(f"adding resource {resource} - {request_info}")
@@ -183,9 +183,11 @@ def request_resource(request_info):
             uri = request.url
         request_info['uri'] = uri
         pieces = uri.split('/')
-        app.logger.info(uri + "=" + ",".join(pieces))
         if len(pieces) == 2:
-            request_info['resource'] = "frontpage"
+            if pieces[1] in config["TRACKED_RESOURCES"]:
+                request_info['resource'] = pieces[1]
+            else:
+                request_info['resource'] = "frontpage"
         else:
             request_info['resource'] = pieces[1]
             if request_info['resource'] == "doc" and len(pieces) > 2:

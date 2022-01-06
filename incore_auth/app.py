@@ -50,11 +50,11 @@ def record_request(request_info):
     uri = request_info['uri']
 
     # only track frontpage once
-    if resource == "frontpage" and uri != "/":
+    if resource == "frontpage" and not (uri.endswith(".html") or uri.endswith("/")):
         return
 
     # only track manual once
-    if resource == "doc" and not uri.endswith(".html"):
+    if resource == "doc" and not (uri.endswith(".html") or uri.endswith("/")):
         return
 
     # only track geoserver once every second

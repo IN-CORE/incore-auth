@@ -54,8 +54,7 @@ def record_request(request_info):
         return
 
     # only track manual once
-    if resource == "doc" and not uri.endswith("index.html"):
-        app.logger.info(f"skipping resource {resource} - {request_info}")
+    if resource == "doc" and not uri.endswith(".html"):
         return
 
     # only track geoserver once every second

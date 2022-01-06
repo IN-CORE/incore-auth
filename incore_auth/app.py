@@ -55,6 +55,7 @@ def record_request(request_info):
 
     # only track manual once
     if resource == "doc" and not uri.endswith("index.html"):
+        app.logger.info(f"skipping resource {resource} - {request_info}")
         return
 
     # only track geoserver once every second
@@ -67,7 +68,7 @@ def record_request(request_info):
     if resource not in config["TRACKED_RESOURCES"]:
         app.logger.debug(f"ignoring resource {resource} - {request_info}")
         return
-    app.logger.debug(f"adding resource {resource} - {request_info}")
+    app.logger.info(f"adding resource {resource} - {request_info}")
 
     remote_ip = request.headers.get('X-Forwarded-For', '')
     if not remote_ip:

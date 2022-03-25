@@ -281,7 +281,6 @@ def verify_token():
     response = Response(status=200)
     response.headers['X-Auth-UserInfo'] = json.dumps(user_info)
     response.headers['X-Auth-UserGroup'] = json.dumps(group_info)
-    print(group_info)
 
     if request.headers.get('Authorization') is not None:
         response.headers['Authorization'] = unquote_plus(request.headers['Authorization'])

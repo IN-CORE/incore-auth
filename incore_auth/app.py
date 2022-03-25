@@ -287,10 +287,10 @@ def verify_token():
     elif request.cookies.get('Authorization') is not None:
         response.headers['Authorization'] = unquote_plus(request.cookies['Authorization'])
 
-    if request.headers.get('X-UserGroup') is not None:
-        response.headers['X-UserGroup'] = request.headers.get('x-UserGroup')
-    elif request.cookies.get('X-UserGroup') is not None:
-        response.headers['X-UserGroup'] = request.cookies['X-UserGroup']
+    if request.headers.get('X-Auth-UserGroup') is not None:
+        response.headers['X-Auth-UserGroup'] = request.headers.get('X-Auth-UserGroup')
+    elif request.cookies.get('X-Auth-UserGroup') is not None:
+        response.headers['X-Auth-UserGroup'] = request.cookies['X-Auth-UserGroup']
 
     return response
 

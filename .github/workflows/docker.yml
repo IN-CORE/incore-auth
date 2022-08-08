@@ -53,7 +53,7 @@ jobs:
           # should we push to dockerhub, and is there a README
           DOCKERHUB_PUSH="false"
           DOCKERHUB_README="false"
-          if [ "$BRANCH" == "main" -a "${{ github.repository }}" == "${{ env.MAIN_REPO }}" ]; then
+          if [ "${{ github.repository }}" == "${{ env.MAIN_REPO }}" ]; then
             if [ "${{ secrets.DOCKERHUB_USERNAME }}" != "" -a "${{ secrets.DOCKERHUB_PASSWORD }}" != "" ]; then
               DOCKERHUB_PUSH="true"
               if [ -e "README.md" ]; then
@@ -64,7 +64,7 @@ jobs:
 
           # should we push to NCSA
           NCSAHUB_PUSH="false"
-          if [ "$BRANCH" == "main" -a "${{ github.repository }}" == "${{ env.MAIN_REPO }}" ]; then
+          if [ "${{ github.repository }}" == "${{ env.MAIN_REPO }}" ]; then
             if [ "${{ secrets.HUB_USERNAME }}" != "" -a "${{ secrets.HUB_PASSWORD }}" != "" ]; then
               NCSAHUB_PUSH="true"
             fi

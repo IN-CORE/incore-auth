@@ -8,7 +8,7 @@ import IP2Location
 import geohash2
 import influxdb_client
 
-from flask import Flask, request, Response, make_response, json
+from flask import Flask, request, Response, make_response
 from jose import jwt
 from jose.exceptions import JWTError, ExpiredSignatureError, JWTClaimsError
 from urllib.parse import unquote_plus

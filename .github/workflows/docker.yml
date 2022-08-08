@@ -65,7 +65,7 @@ jobs:
           # should we push to NCSA
           NCSAHUB_PUSH="false"
           if [ "$BRANCH" == "main" -a "${{ github.repository }}" == "${{ env.MAIN_REPO }}" ]; then
-            if [ "${{ secrets.DOCKERHUB_USERNAME }}" != "" -a "${{ secrets.DOCKERHUB_PASSWORD }}" != "" ]; then
+            if [ "${{ secrets.HUB_USERNAME }}" != "" -a "${{ secrets.HUB_PASSWORD }}" != "" ]; then
               NCSAHUB_PUSH="true"
             fi
           fi

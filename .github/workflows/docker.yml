@@ -36,6 +36,9 @@ jobs:
             BRANCH=${GITHUB_REF##*/}
           fi
 
+          OWNER=${{ github.repository_owner }}
+          OWNER_LC=${OWNER,,}
+
           # calculate the version and all tags
           if [ "$BRANCH" == "main" ]; then
             VERSION="$(awk '/^# \[/ { print $2; exit }' CHANGELOG.md | sed -e 's/\[//' -e 's/\]//')"
@@ -82,7 +85,7 @@ jobs:
             if [ "$NCSAHUB_PUSH" == "true" ]; then
               IMAGES="${IMAGES}${NCSAHUB}/${IMAGE}:${tag},"
             fi
-            IMAGES="${IMAGES}ghcr.io/${{ github.repository_owner }}/${IMAGE}:${tag},"
+            IMAGES="${IMAGES}ghcr.io/${OWNER_LC}/${IMAGE}:${tag},"
           done
           IMAGES="${IMAGES%,*}"
 

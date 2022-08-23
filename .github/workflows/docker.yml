@@ -18,6 +18,8 @@ env:
 jobs:
   docker:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
 
     steps:
       - uses: actions/checkout@v2
@@ -80,7 +82,7 @@ jobs:
             if [ "$NCSAHUB_PUSH" == "true" ]; then
               IMAGES="${IMAGES}${NCSAHUB}/${IMAGE}:${tag},"
             fi
-            #IMAGES="${IMAGES}ghcr.io/${{ github.repository_owner }}/${IMAGE}:${tag},"
+            IMAGES="${IMAGES}ghcr.io/${{ github.repository_owner }}/${IMAGE}:${tag},"
           done
           IMAGES="${IMAGES%,*}"
 

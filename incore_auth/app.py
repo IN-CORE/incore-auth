@@ -67,7 +67,7 @@ def record_request(request_info):
     if resource not in config["TRACKED_RESOURCES"]:
         app.logger.debug(f"ignoring resource {resource} - {request_info}")
         return
-    app.logger.info(f"adding resource {resource} - {request_info}")
+    app.logger.debug(f"adding resource {resource} - {request_info}")
 
     remote_ip = request.headers.get('X-Forwarded-For', '')
     if not remote_ip:
@@ -135,11 +135,16 @@ def record_request(request_info):
 def request_userinfo(request_info):
     # retrieve access token from header or cookies
     try:
-        if request.headers.get('Authorization') is not None:
-            access_token = unquote_plus(request.headers['Authorization']).split(" ")[1]
-        elif request.cookies.get('Authorization') is not None:
-            access_token = unquote_plus(request.cookies['Authorization']).split(" ")[1]
-        else:
+        access_token = None
+        if not access_token and request.headers.get('Authorization') is not None:
+            parts = unquote_plus(request.headers['Authorization']).split(" ", 2)
+            if parts[0].lower() == 'bearer':
+                access_token = parts[1]
+        if not access_token and request.cookies.get('Authorization') is not None:
+            parts = unquote_plus(request.cookies['Authorization']).split(" ", 2)
+            if parts[0].lower() == 'bearer':
+                access_token = parts[1]
+        if not access_token:
             app.logger.debug("Missing Authorization header")
             request_info['error'] = 'Missing Authorization information'
             return

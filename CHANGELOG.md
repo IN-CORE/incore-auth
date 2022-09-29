@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 From version 1.2.0 the file IP2LOCATION-LITE-DB5.BIN is no longer part of the docker image and will need to be downloaded (after registration) from [ip2location](https://lite.ip2location.com/database/ip-country?lang=en_US) and be placed in /srv/incore_auth.
 
+# [Unreleased]
+
+## Changed
+- Added playbook and its sub directories to tracking resource [#32](https://github.com/IN-CORE/incore-auth/issues/32)
+
 # [1.5.0] - 2022-09-24
 
 ## Changed

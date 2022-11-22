@@ -11,6 +11,7 @@ From version 1.2.0 the file IP2LOCATION-LITE-DB5.BIN is no longer part of the do
 - information about user and groups is synced every 30 minutes back to the database and datawolf
 
 ## Changed
+- Added playbook and its sub directories to tracking resource [#32](https://github.com/IN-CORE/incore-auth/issues/32)
 - updated all packages used
 
 # [1.5.0] - 2022-09-24

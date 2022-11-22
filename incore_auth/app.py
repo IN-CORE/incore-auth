@@ -254,6 +254,8 @@ def request_resource(request_info):
             request_info['resource'] = pieces[1]
             if request_info['resource'] == "doc" and len(pieces) > 2:
                 request_info['fields']['manual'] = pieces[2]
+            if request_info['resource'] == "playbook" and len(pieces) > 2:
+                request_info['fields']['playbook'] = pieces[2]
             if request_info['resource'] == "data" and len(pieces) > 4 and uri.endswith('blob'):
                 request_info['fields']['dataset'] = pieces[4]
             if request_info['resource'] == "dfr3" and len(pieces) > 4:

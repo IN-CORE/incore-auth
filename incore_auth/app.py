@@ -7,6 +7,9 @@ import urllib.request
 import IP2Location
 import geohash2
 import influxdb_client
+import pymongo
+
+from cachetools import cached, LRUCache, TTLCache
 
 from flask import Flask, request, Response, make_response, json
 from jose import jwt
@@ -25,6 +28,10 @@ app.config.from_mapping(config)
 geoserver = {}
 geoserver_delta = 2
 
+cache_size = 1024
+# timeout in seconds, in this case 30 minutes
+cache_timeout = 30*60
+
 # setup database for geolocation
 try:
     geolocation = IP2Location.IP2Location(CONTRIBUTION_DB_NAME)
@@ -38,6 +45,53 @@ if __name__ != '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
+
+
+def cache_key(request_info):
+    """Return username from request_info to be used as cache key"""
+    return request_info["username"]
+
+
+@cached(cache=TTLCache(maxsize=cache_size, ttl=cache_timeout), key=cache_key)
+def update_services(request_info):
+    """When a user does any action, it will check to update the groups in mongo, as well as make sure
+    the user has access to datawolf. The function is cached to make sure only every 30 minutes we do
+    the checks, since this can be expensive."""
+
+    # get information from request
+    username = request_info["username"]
+    if not username:
+        return username
+    groups = request_info['groups']
+
+    # call datawolf to add user
+    # TODO add datawolf call
+
+    # update database with user quota
+    mongo_client = config["mongo_client"]
+    if mongo_client:
+        mongo_user = mongo_client["spacedb"]["UserGroups"].find_one({"username": username})
+
+        if mongo_user is None:
+            # INSERT
+            mongo_client["spacedb"]["UserGroups"].insert_one({
+                "username": username,
+                "className": "edu.illinois.ncsa.incore.common.models.UserGroups",
+                "groups": groups
+            })
+            app.logger.debug(f"Inserted groups document for {username}")
+        else:
+            # compare groups and sync if needed
+            if set(groups) != set(mongo_user["groups"]):
+                mongo_client["spacedb"]["UserGroups"].update_one(
+                    {"username": username}, {"$set": {"groups": groups}}
+                )
+                app.logger.debug(f"Synced groups for {username} - {groups}")
+            else:
+                app.logger.debug(f"No sync needed for {username}")
+
+    # done
+    return username
 
 
 def record_request(request_info):
@@ -253,6 +307,9 @@ def verify_token():
     request_resource(request_info)
     request_userinfo(request_info)
 
+    # update backend services
+    update_services(request_info)
+
     # record request
     record_request(request_info)
 
@@ -339,6 +396,14 @@ def setup():
         config['audience'] = keycloak_audience
     else:
         config['audience'] = None
+
+    # setup mongodb
+    mongodb_uri = os.environ.get('MONGODB_URI', None)
+    if mongodb_uri:
+        mongo_client = pymongo.MongoClient(mongodb_uri)
+        config["mongo_client"] = mongo_client
+    else:
+        config["mongo_client"] = None
 
     # setup influxdb
     try:

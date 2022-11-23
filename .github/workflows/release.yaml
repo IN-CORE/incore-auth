@@ -27,8 +27,8 @@ jobs:
           changelog="${changelog//'%'/'%25'}"
           changelog="${changelog//$'\n'/'%0A'}"
           changelog="${changelog//$'\r'/'%0D'}"
-          echo "::set-output name=version::$version"
-          echo "::set-output name=changelog::$changelog"
+          echo "version=$version" >> $GITHUB_OUTPUT
+          echo "changelog=$changelog" >> $GITHUB_OUTPUT
 
       - name: create release
         if: github.event_name != 'pull_request' && github.repository == env.MAIN_REPO

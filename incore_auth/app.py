@@ -10,7 +10,7 @@ import geohash2
 import influxdb_client
 import pymongo
 
-from cachetools import cached, LRUCache, TTLCache
+from cachetools import cached, TTLCache
 
 from flask import Flask, request, Response, make_response, json
 from jose import jwt
@@ -51,6 +51,7 @@ if __name__ != '__main__':
 def cache_key(request_info):
     """Return username from request_info to be used as cache key"""
     return request_info["username"]
+
 
 def update_services_thread(request_info):
     """When a user does any action, it will check to update the groups in mongo, as well as make sure

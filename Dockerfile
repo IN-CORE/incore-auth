@@ -18,7 +18,7 @@ ENV FLASK_APP="app.py" \
     KEYCLOAK_PUBLIC_KEY="" \
     KEYCLOAK_AUDIENCE="" \
     DATAWOLF_URL="http://incore-datawolf:8888/datawolf" \
-    MONGODB_URI="" \
+    MONGODB_URI="mongodb://root:incorerocks@incore-mongodb:27017/commondb?maxpoolsize=100&authSource=admin" \
     INFLUXDB_V2_URL="" \
     INFLUXDB_V2_ORG="" \
     INFLUXDB_V2_TOKEN="" \

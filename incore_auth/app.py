@@ -2,6 +2,7 @@ import logging
 import json
 import os
 import time
+import threading
 import urllib.request
 
 import IP2Location
@@ -51,9 +52,7 @@ def cache_key(request_info):
     """Return username from request_info to be used as cache key"""
     return request_info["username"]
 
-
-@cached(cache=TTLCache(maxsize=cache_size, ttl=cache_timeout), key=cache_key)
-def update_services(request_info):
+def update_services_thread(request_info):
     """When a user does any action, it will check to update the groups in mongo, as well as make sure
     the user has access to datawolf. The function is cached to make sure only every 30 minutes we do
     the checks, since this can be expensive."""
@@ -65,33 +64,68 @@ def update_services(request_info):
     groups = request_info['groups']
 
     # call datawolf to add user
-    # TODO add datawolf call
+    datawolf_url = config["datawolf_url"]
+    if datawolf_url:
+        query = urllib.parse.urlencode({
+            "firstname": request_info["firstname"],
+            "lastname": request_info["lastname"],
+            "email": username
+        })
+        datawolf_url = "%s/persons?%s" % (datawolf_url.rstrip("/"), query)
+        req = urllib.request.Request(datawolf_url, method='POST')
+        response = urllib.request.urlopen(req)
+        if response.code == 200:
+            app.logger.info(f"Added user to datawolf {username}")
+        elif response.code == 204:
+            app.logger.debug(f"User already exists in datawolf {username}")
+        else:
+            app.logger.info(f"Did not add user to datawolf {username}")
 
     # update database with user quota
     mongo_client = config["mongo_client"]
     if mongo_client:
         mongo_user = mongo_client["spacedb"]["UserGroups"].find_one({"username": username})
-
-        if mongo_user is None:
+        if not mongo_user:
             # INSERT
             mongo_client["spacedb"]["UserGroups"].insert_one({
                 "username": username,
                 "className": "edu.illinois.ncsa.incore.common.models.UserGroups",
                 "groups": groups
             })
-            app.logger.debug(f"Inserted groups document for {username}")
+            app.logger.info(f"Inserted groups document for {username}")
+        elif set(groups) != set(mongo_user["groups"]):
+            # UPDATE
+            mongo_client["spacedb"]["UserGroups"].update_one(
+                {"username": username}, {"$set": {"groups": groups}}
+            )
+            app.logger.info(f"Synced groups for {username} - {groups}")
         else:
-            # compare groups and sync if needed
-            if set(groups) != set(mongo_user["groups"]):
-                mongo_client["spacedb"]["UserGroups"].update_one(
-                    {"username": username}, {"$set": {"groups": groups}}
-                )
-                app.logger.debug(f"Synced groups for {username} - {groups}")
-            else:
-                app.logger.debug(f"No sync needed for {username}")
+            # NOTHING
+            app.logger.debug(f"No sync needed for {username}")
 
-    # done
-    return username
+        mongo_space = mongo_client["spacedb"]["Space"].find_one({"metadata.name": username})
+        if not mongo_space:
+            mongo_client["spacedb"]["Space"].insert_one({
+                "className": "edu.illinois.ncsa.incore.common.models.Space",
+                "metadata": {
+                    "className": "edu.illinois.ncsa.incore.common.models.SpaceMetadata",
+                    "name": username
+                },
+                "privileges": {
+                    "className": "edu.illinois.ncsa.incore.common.auth.Privileges",
+                    "userPrivileges": {
+                        username: "ADMIN"
+                    }
+                },
+                "members": [
+                ]
+            })
+            app.logger.info(f"Inserted space document for {username}")
+
+
+@cached(cache=TTLCache(maxsize=cache_size, ttl=cache_timeout), key=cache_key)
+def update_services(request_info):
+    threading.Thread(target=update_services_thread, args=(request_info,), daemon=True).start()
 
 
 def record_request(request_info):
@@ -227,6 +261,11 @@ def request_userinfo(request_info):
         request_info['error'] = 'JWT Error: invalid token'
         return
 
+    # get name of user
+    request_info["firstname"] = access_token["given_name"]
+    request_info["lastname"] = access_token["family_name"]
+    request_info["fullname"] = access_token["name"]
+
     # retrieve the groups the user belongs to from access token
     request_info['username'] = access_token["preferred_username"]
     request_info['groups'] = access_token.get("groups", [])
@@ -294,6 +333,9 @@ def verify_token():
     # dict to hold all information
     request_info = {
         "username": "",
+        "firstname": "",
+        "lastname": "",
+        "fullname": "",
         "method": request.method,
         "url": request.path,
         "resource": "",
@@ -398,6 +440,9 @@ def setup():
         config['audience'] = keycloak_audience
     else:
         config['audience'] = None
+
+    # store datawolf url
+    config["datawolf_url"] = os.environ.get('DATAWOLF_URL', None)
 
     # setup mongodb
     mongodb_uri = os.environ.get('MONGODB_URI', None)

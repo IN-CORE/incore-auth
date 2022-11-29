@@ -1,6 +1,14 @@
 {
     "PROTECTED_RESOURCES": ["data", "dfr3", "hazard", "space", "semantics", "maestro", "datawolf", "plotting", "hub"],
     "TRACKED_RESOURCES": ["data", "dfr3", "hazard", "space", "semantics", "maestro", "datafwolf", "plotting", "playbook", "frontpage", "geoserver", "doc", "hub", "lab", "auth", "DFR3Viewer", "DataViewer", "HazardViewer", "jupyterhub"],
-    "GROUPS": {"incore_user": ["data", "dfr3", "hazard", "space", "semantics", "maestro", "datawolf", "plotting", "hub"]},
-    "ROLES": {"incore_user": ["data", "dfr3", "hazard", "space", "semantics", "maestro", "datawolf", "plotting", "hub"]}
+    "GROUPS": {"incore_user": ["data", "dfr3", "hazard", "space", "semantics", "maestro", "datawolf", "plotting", "hub"],
+               "incore_slc_user":["data", "dfr3", "hazard", "space", "maestro", "datawolf"],
+               "incore_galveston_user":["data", "dfr3", "hazard", "space", "maestro", "datawolf"],
+               "incore_joplin_user":["data", "dfr3", "hazard", "space", "maestro", "datawolf"]
+              },
+    "ROLES": {"incore_user": ["data", "dfr3", "hazard", "space", "semantics", "maestro", "datawolf", "plotting", "hub"],
+              "incore_slc_user":["data", "dfr3", "hazard", "space", "maestro", "datawolf"],
+              "incore_galveston_user":["data", "dfr3", "hazard", "space", "maestro", "datawolf"],
+              "incore_joplin_user":["data", "dfr3", "hazard", "space", "maestro", "datawolf"]
+             }
 }

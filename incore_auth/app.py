@@ -18,6 +18,8 @@ from jose.exceptions import JWTError, ExpiredSignatureError, JWTClaimsError
 from urllib.parse import unquote_plus
 from dotenv import load_dotenv
 
+import bson
+
 # Load .env file
 load_dotenv()
 CONTRIBUTION_DB_NAME = os.getenv('INFLUXDB_V2_FILE_LOCATION', 'data/IP2LOCATION-LITE-DB5.BIN')
@@ -120,6 +122,23 @@ def update_services_thread(request_info):
                 },
                 "members": [
                 ]
+            })
+            app.logger.info(f"Inserted space document for {username}")
+
+        mongo_usage = mongo_client["spacedb"]["UserAllocations"].find_one({"username": username})
+        if not mongo_usage:
+            mongo_client["spacedb"]["UserAllocations"].insert_one({
+                "className": "edu.illinois.ncsa.incore.common.models.UserAllocations",
+                "username": username,
+                "usage": {
+                    "className": "edu.illinois.ncsa.incore.common.models.UserUsages",
+                    "datasets": int(0),
+                    "hazards": int(0),
+                    "hazardDatasets": int(0),
+                    "dfr3": int(0),
+                    "datasetSize": bson.Int64(0),
+                    "hazardDatasetSize": bson.Int64(0)
+                }
             })
             app.logger.info(f"Inserted space document for {username}")
 

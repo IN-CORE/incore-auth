@@ -9,4 +9,3 @@ geohash2==1.*
 python-dotenv==0.*
 pymongo==4.*
 cachetools==4.*
-bson==0.*

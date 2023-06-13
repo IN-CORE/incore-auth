@@ -9,6 +9,7 @@ From version 1.2.0 the file IP2LOCATION-LITE-DB5.BIN is no longer part of the do
 
 ## Added
 - New user default usage to zero [#38](https://github.com/IN-CORE/incore-auth/issues/38)
+- Return a user object that contains username, fullname, email, groups and roles.
 
 
 # [1.6.0] - 2023-03-14

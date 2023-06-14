@@ -18,6 +18,8 @@ from jose.exceptions import JWTError, ExpiredSignatureError, JWTClaimsError
 from urllib.parse import unquote_plus
 from dotenv import load_dotenv
 
+import bson
+
 # Load .env file
 load_dotenv()
 CONTRIBUTION_DB_NAME = os.getenv('INFLUXDB_V2_FILE_LOCATION', 'data/IP2LOCATION-LITE-DB5.BIN')
@@ -120,6 +122,23 @@ def update_services_thread(request_info):
                 },
                 "members": [
                 ]
+            })
+            app.logger.info(f"Inserted space document for {username}")
+
+        mongo_usage = mongo_client["spacedb"]["UserAllocations"].find_one({"username": username})
+        if not mongo_usage:
+            mongo_client["spacedb"]["UserAllocations"].insert_one({
+                "className": "edu.illinois.ncsa.incore.common.models.UserAllocations",
+                "username": username,
+                "usage": {
+                    "className": "edu.illinois.ncsa.incore.common.models.UserUsages",
+                    "datasets": int(0),
+                    "hazards": int(0),
+                    "hazardDatasets": int(0),
+                    "dfr3": int(0),
+                    "datasetSize": bson.Int64(0),
+                    "hazardDatasetSize": bson.Int64(0)
+                }
             })
             app.logger.info(f"Inserted space document for {username}")
 
@@ -263,9 +282,10 @@ def request_userinfo(request_info):
         return
 
     # get name of user
-    request_info["firstname"] = access_token["given_name"]
-    request_info["lastname"] = access_token["family_name"]
-    request_info["fullname"] = access_token["name"]
+    request_info["firstname"] = access_token.get("given_name", "")
+    request_info["lastname"] = access_token.get("family_name", "")
+    request_info["fullname"] = access_token.get("name", "")
+    request_info["email"] = access_token.get("email", "")
 
     # retrieve the groups the user belongs to from access token
     request_info['username'] = access_token["preferred_username"]
@@ -337,6 +357,7 @@ def verify_token():
         "firstname": "",
         "lastname": "",
         "fullname": "",
+        "email": "",
         "method": request.method,
         "url": request.path,
         "resource": "",
@@ -385,19 +406,23 @@ def verify_token():
     # everything is ok
     user_info = {"preferred_username": request_info['username']}
     group_info = {"groups": request_info['groups']}
+    user_object = {
+        "username": request_info['username'],
+        "email": request_info['email'],
+        "fullname": request_info['fullname'],
+        "groups": request_info['groups'],
+        "roles": request_info['roles'],
+    }
+
     response = Response(status=200)
     response.headers['X-Auth-UserInfo'] = json.dumps(user_info)
     response.headers['X-Auth-UserGroup'] = json.dumps(group_info)
+    response.headers['X-Auth-User'] = json.dumps(user_object)
 
     if request.headers.get('Authorization') is not None:
         response.headers['Authorization'] = unquote_plus(request.headers['Authorization'])
     elif request.cookies.get('Authorization') is not None:
         response.headers['Authorization'] = unquote_plus(request.cookies['Authorization'])
-
-    if request.headers.get('X-Auth-UserGroup') is not None:
-        response.headers['X-Auth-UserGroup'] = request.headers.get('X-Auth-UserGroup')
-    elif request.cookies.get('X-Auth-UserGroup') is not None:
-        response.headers['X-Auth-UserGroup'] = request.cookies['X-Auth-UserGroup']
 
     return response
 

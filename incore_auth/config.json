@@ -1,6 +1,6 @@
 {
-    "PROTECTED_RESOURCES": ["data", "dfr3", "hazard", "space", "semantics", "maestro", "datawolf", "plotting", "hub"],
-    "TRACKED_RESOURCES": ["data", "dfr3", "hazard", "space", "semantics", "maestro", "datafwolf", "plotting", "playbook", "frontpage", "geoserver", "doc", "hub", "lab", "auth", "DFR3Viewer", "DataViewer", "HazardViewer", "jupyterhub"],
-    "GROUPS": {"incore_user": ["data", "dfr3", "hazard", "space", "semantics", "maestro", "datawolf", "plotting", "hub"]},
-    "ROLES": {"incore_user": ["data", "dfr3", "hazard", "space", "semantics", "maestro", "datawolf", "plotting", "hub"]}
+    "PROTECTED_RESOURCES": ["data", "dfr3", "hazard", "space", "semantics", "project", "maestro", "datawolf", "plotting", "hub", "geoserver"],
+    "TRACKED_RESOURCES": ["data", "dfr3", "hazard", "space", "semantics", "project", "maestro", "datafwolf", "plotting", "playbook", "frontpage", "geoserver", "doc", "hub", "lab", "auth", "DFR3Viewer", "DataViewer", "HazardViewer", "jupyterhub"],
+    "GROUPS": {"incore_user": ["data", "dfr3", "hazard", "space", "semantics", "project", "maestro", "datawolf", "plotting", "hub"]},
+    "ROLES": {"incore_user": ["data", "dfr3", "hazard", "space", "semantics", "project", "maestro", "datawolf", "plotting", "hub"]}
 }

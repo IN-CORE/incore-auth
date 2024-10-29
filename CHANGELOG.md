@@ -7,9 +7,12 @@ From version 1.2.0 the file IP2LOCATION-LITE-DB5.BIN is no longer part of the do
 
 # Unreleased
 
-# Added
+## Added
 - Geoserver is added to incore-auth [#46](https://github.com/IN-CORE/incore-auth/issues/46)
 - Project service is added to incore-auth [#47](https://github.com/IN-CORE/incore-auth/issues/47)
+
+## Changed
+- Geoserver is removed from incore-auth [#51](https://github.com/IN-CORE/incore-auth/issues/51)
 
 # [1.7.0] - 2023-06-14
 

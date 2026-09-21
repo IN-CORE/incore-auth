@@ -15,3 +15,7 @@ has the appropriate group for each service.
 
 The auth module will track usage in influxdb (if enabled). To track the geolocation you will need
 IP2LOCATION-LITE-DB5.BIN.
+
+## License
+
+This project is licensed under the [Mozilla Public License 2.0](https://www.mozilla.org/MPL/2.0/). See [LICENSE](LICENSE).
